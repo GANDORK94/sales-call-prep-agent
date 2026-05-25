@@ -1,42 +1,75 @@
 # Sales Call Brief
 
+**Company:** Capital One  
+**Persona:** VP of Sales  
+**Generated:** 2026-05-25 14:28
+
+---
+
 ## Account
-Linear is a Series B developer tooling company, likely building a SaaS product for software teams given the category. They are at a growth stage where engineering headcount (estimated 50 to 100 engineers) is scaling fast enough that process and tooling decisions have real downstream consequences. They currently use Jira, which suggests tooling decisions were made earlier in the company's life and may not have been revisited since headcount grew.
+Capital One is one of the largest U.S. banks, operating across consumer credit cards, commercial banking, small business lending, and B2B partnerships. The company is unusually tech-forward for financial services, building much of its own internal tooling and running engineering at scale. Any vendor conversation here will face a higher bar on build-vs-buy than at a traditional bank.
 
 ## Persona
-The Head of Engineering at a company this size typically owns engineering productivity, team structure, and delivery reliability. Day to day, they are navigating sprint planning, cross-functional alignment with product, and keeping engineers unblocked. They are likely measured on shipping velocity, team retention, and their ability to scale the org without introducing process debt.
+This VP likely owns revenue or portfolio targets across a distributed team of AEs or relationship managers, with day-to-day focus on pipeline health, forecast accuracy, and whether their reps are showing up to customer conversations ready to have the right discussion. They are measured on quota attainment and team productivity, which means rep ramp time and call quality inconsistency are personal problems, not abstract ones. (Assumption) The specific segment they lead is unknown, which affects how complex and relationship-driven their sales motion actually is.
 
 ## Likely Priorities
-- Keeping engineers focused and productive as the team scales, since adding headcount without fixing process often slows things down rather than speeding them up
-- Reducing friction between engineering and product so roadmap execution stays on track (Assumption)
-- Retaining strong engineers, where tooling and developer experience are increasingly a factor in satisfaction
-- Preparing the engineering org for what comes after Series B, whether that is a larger team, more complex products, or tighter delivery expectations (Assumption)
+- Reducing the productivity gap between top-performing reps and the rest of the team, especially if there has been recent turnover or headcount pressure. (Assumption)
+- Improving discovery call quality across the team without adding more manager overhead or live call coaching hours.
+- Compressing ramp time for new AEs so they can carry real quota faster. (Assumption)
+- Defending or growing their book against competitors in a cost-conscious environment where headcount growth is unlikely.
 
 ## Potential Pain Points
-- **Jira overhead eating into engineering time.** When engineers spend meaningful time updating tickets, navigating complex workflows, or working around the tool, that is time not spent shipping. At a Series B company, velocity is a competitive advantage, and anything slowing it down has a direct cost.
-- **Tooling that does not reflect how modern engineering teams actually work.** Jira was built for a different era of software development. If the workflow does not match how the team thinks, engineers route around it, which means the data in the tool becomes unreliable for the Head of Engineering trying to understand delivery health.
-- **Constant team complaints about the tool becoming a management distraction.** If engineers are vocal about Jira frustration, the Head of Engineering is fielding that feedback and choosing between fixing it or absorbing the morale cost. Neither is a good use of their time.
-- **Lack of visibility into real progress without manual effort.** At this headcount, getting a clear picture of what is in flight, what is blocked, and what is at risk often requires chasing updates or running standup questions that should already have answers. That is a sign the tooling is not doing its job.
-- **Onboarding new engineers into a messy system.** Jira configurations accumulate over time, and new hires often find the setup confusing or inconsistent. This slows ramp time and creates a bad first impression of the engineering org's maturity. (Assumption: current Jira setup has grown complex with the team)
+**Inconsistent call preparation across the team.** When reps do their own research differently, some show up sharp and some show up generic, and the VP has no lever to fix that at scale without a process change.
+
+**Rep ramp time drags on quota capacity.** New AEs at a company like Capital One have to learn both complex products and a customer base with sophisticated needs. Every week a new rep is not fully productive is direct revenue drag.
+
+**Managers spending coaching time on basics instead of strategy.** If frontline managers are still reviewing decks and coaching reps on who the buyer is and what they care about, they are not spending time on deal strategy or skills development where it actually matters.
+
+**Call quality is hard to inspect until it is too late.** A VP rarely sees a bad discovery call until it shows up as a stalled deal in the pipeline. By then the damage is done and the feedback loop back to the rep is delayed and low-impact.
+
+**High prep time per call reduces rep throughput.** If AEs are spending 45 minutes manually researching each prospect before a discovery call, that time is not being spent on outreach or follow-up. At scale across a large team, this is a significant capacity leak.
 
 ## Discovery Questions
-1. When your engineers push back on Jira, what specifically are they running into? Is it the day-to-day workflow, the setup and configuration, or something else?
-2. How are you currently getting visibility into what is actually in progress versus what is at risk in a given sprint or cycle?
-3. When you think about where engineering time is getting wasted right now, where does tooling factor in compared to other things like meetings or context switching?
-4. How does your team coordinate between engineering and product today, and where does that process tend to break down?
-5. If you were to replace Jira, what would the team need to see to feel confident the new tool was actually better and not just different?
+1. When you think about your top-performing reps versus the rest of the team, what do you see them doing differently in how they prepare for a first call with a prospect?
+
+2. How are your AEs currently researching and preparing for discovery calls, and how much time are they typically spending on that before they get on the phone?
+
+3. When a deal stalls or goes quiet after the first call, what do you usually trace it back to in your deal reviews?
+
+4. How are you and your managers currently coaching reps on call preparation, and where does that process break down when you are managing a team at this scale?
+
+5. If a new AE joined your team today, how long before you would expect them to be running discovery calls that actually move deals forward, and what is the main thing slowing that down?
 
 ## Sample Outreach
-**Subject: Engineering tooling at Linear**
+**Subject: Cutting discovery call prep time for large AE teams**
 
-Hi [Name], heads of engineering at Series B companies often tell me that Jira made sense early on but starts working against the team once you hit a certain size. Complaints pile up, visibility gets harder, and fixing the configuration feels like a distraction from actual engineering work. Curious whether that resonates with where Linear is right now. Would a 20-minute conversation be worth it to compare notes?
+Hi [Name], sales leaders running large teams at Capital One are under real pressure to keep rep productivity high without adding headcount. One place that leaks quietly is pre-call prep: when every AE researches their own way, you get inconsistent call quality and a lot of hours that could be spent selling. We built a call prep agent that gives AEs a structured briefing before every discovery call in minutes, not 45. Worth a 20-minute conversation to see if it fits what you are working on?
 
-[Your name]
+## Assumptions and Gaps
+- The segment this VP leads is unknown. Whether their AEs sell complex commercial products or work a higher-velocity book changes which pain points to lead with and how to frame the value of structured prep.
+- It is unclear whether Capital One has an existing internal tool that does any version of call prep or account briefing. Given their engineering culture, this is a real possibility and the rep should be ready for it.
+- No information on current sales stack or CRM. If they are on a custom internal system, the CLI format may face friction and integration questions will come up early.
+- It is unknown whether this VP has budget authority for external tools or whether procurement and legal involvement is heavy at the stage of even an initial conversation.
+- Headcount situation is unconfirmed. If this team has been cut recently, the productivity angle will land harder. If they are in a growth phase, the ramp time angle is more relevant.
+- Data security and compliance questions are almost certain to come up. The rep should know in advance what data the agent accesses, how prompts are handled, and whether anything is stored before that question surfaces.
 
-## Assumptions / Gaps
-- Linear's product category is inferred as SaaS for software teams. Confirm what they actually build and who their customers are, since this shapes how engineering delivery is structured.
-- Headcount is estimated at 50 to 100 engineers. Confirm actual size and whether the team is growing quickly, since pace of hiring affects urgency.
-- The Jira complaints are noted by the rep but the source is unclear. Verify whether this is coming from engineers broadly, specific teams, or leadership.
-- It is unclear whether the Head of Engineering owns the tooling decision or whether it sits with engineering managers, a VP of Engineering, or an internal DevOps or platform team.
-- No information on whether there is an active evaluation underway or a budget cycle approaching. Try to surface this early in the call.
-- Linear as a company name could create confusion since there is also a well-known project management tool called Linear. Confirm this is a different company before the call to avoid an awkward moment.
+---
+
+## Agent Review Notes
+
+**Pain Points: "High prep time per call reduces rep throughput"**
+The 45-minute figure is presented as fact. Label it as an assumption or benchmark, not Capital One-specific data.
+
+**Pain Points: "Call quality is hard to inspect until it is too late"**
+This applies to almost any B2B sales org. Tie it to Capital One's scale or engineering culture to earn its place here.
+
+**Discovery Questions: Questions 1 and 3**
+Both can be answered with a short, closed response that kills momentum. Reframe them to ask "how" or "walk me through" to force a real answer.
+
+**Priorities: "Defending or growing their book against competitors"**
+Too generic. Every sales leader faces this. Either connect it to something Capital One-specific (credit card market pressure, fintech competition) or cut it.
+
+**Outreach: "sales leaders running large teams at Capital One"**
+The opening implies peer benchmarking without any actual data to support it. Remove or replace with something verifiable.
+
+The brief is otherwise strong, especially the assumptions section.

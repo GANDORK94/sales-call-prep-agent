@@ -1,14 +1,17 @@
 """
 Prompts for the Sales Call Prep Agent.
 
-Three-layer architecture:
-  SYSTEM_PROMPT         -- defines the agent's role, tone, and rules (stable across all calls)
-  TASK_PROMPT_TEMPLATE  -- what to do with the specific inputs (company, persona, notes)
-  OUTPUT_FORMAT_TEMPLATE -- the exact markdown structure the model must follow
+One prompt per agent step:
+  PLANNING_PROMPT  -- step 1: decide the angle before generating
+  CONTEXT_PROMPT   -- step 2: organize what is known about the company
+  BRIEFING_PROMPT  -- step 3: generate the full seven-section brief
+  REVIEW_PROMPT    -- step 4: flag weak spots in the output
 
-To tune the agent's behavior, edit only the relevant layer.
-To add or rename a section, edit OUTPUT_FORMAT_TEMPLATE.
-To change tone or rules, edit SYSTEM_PROMPT.
+SYSTEM_PROMPT applies to all four steps.
+
+To tune the agent's tone or rules, edit SYSTEM_PROMPT.
+To adjust what any step produces, edit that step's prompt.
+To add a new output section, edit BRIEFING_PROMPT.
 """
 
 SYSTEM_PROMPT = """You are a sales research assistant helping account executives and SDRs prepare for prospect calls.
@@ -21,50 +24,89 @@ Rules:
 - Never invent specific revenue figures, headcount counts, or internal product names without a stated basis.
 - Cut anything that does not help the rep prepare for the call. No filler, no corporate jargon.
 - Write in plain English.
-- Every pain point and discovery question must connect directly to the persona's role and likely day-to-day reality, not just the company in general.
+- Every pain point and discovery question must connect directly to the persona's role and likely day-to-day reality.
 - Do not use em dashes. Use commas, periods, or parentheses instead."""
 
 
-TASK_PROMPT_TEMPLATE = """Prepare a sales call brief for the following prospect.
+PLANNING_PROMPT = """Before generating a sales call brief, plan the approach.
 
 Company: {company_name}
-Persona: {persona_title}{notes_block}
+Persona: {persona_title}
+Rep notes: {notes}
 
-Use only the output format provided. Do not add sections, change headers, or summarize at the end."""
+In 4 to 6 bullet points, outline:
+- The most important angle for this specific persona at this company
+- What the rep most needs to know going into this call
+- Any gaps in the available information that will affect the brief
+- What to focus on to make the output genuinely useful rather than generic
+
+Be brief and direct. This is a planning note, not a document."""
 
 
-OUTPUT_FORMAT_TEMPLATE = """Return your response in this exact markdown structure. Use these headers verbatim.
+CONTEXT_PROMPT = """Organize the known context for this prospect before writing the full brief.
 
-# Sales Call Brief
+Company: {company_name}
+Persona: {persona_title}
+Planning notes:
+{plan}
+
+In 2 to 3 short paragraphs, summarize:
+- What is publicly known or reasonably inferred about this company
+- What someone in this role typically owns, cares about, and is measured on
+- Any relevant industry dynamics or pressures that shape this conversation
+
+Label anything uncertain. Keep it factual and concise. This will be used as background for the briefing."""
+
+
+BRIEFING_PROMPT = """Generate a sales call brief using the context and planning notes below.
+
+Company: {company_name}
+Persona: {persona_title}
+Rep notes: {notes}
+
+Planning notes:
+{plan}
+
+Background context:
+{context}
+
+Return your response in this exact markdown structure. Use these headers verbatim.
 
 ## Account
-2 to 3 sentences on what the company does, who they serve, and their current situation or market position. If specific details are uncertain, speak to the category and likely profile. Flag anything inferred.
+2 to 3 sentences on what the company does, who they serve, and their current situation. Flag anything inferred.
 
 ## Persona
 2 to 3 sentences on what this role likely owns, cares about day-to-day, and is measured on. Make it role-specific, not a generic job description.
 
 ## Likely Priorities
-3 to 4 bullet points on what this person is probably focused on right now, based on their role, the company's stage, and any context provided. Label anything speculative with (Assumption).
+3 to 4 bullet points on what this person is probably focused on right now. Label anything speculative with (Assumption).
 
 ## Potential Pain Points
-3 to 5 pain points specific to this persona at this type of company. For each pain point, write one sentence naming the problem and one sentence explaining why it matters commercially. Be concrete.
+3 to 5 pain points specific to this persona at this company. For each: one sentence naming the problem, one sentence on why it matters commercially.
 
 ## Discovery Questions
-Exactly 5 open-ended questions. Each question should surface real problems, current state, or decision criteria. No yes or no questions. No leading questions. Questions should feel natural in a real call, not scripted.
+Exactly 5 open-ended questions. No yes or no questions. No leading questions. Should feel natural in a real call.
 
 ## Sample Outreach
-A short email or LinkedIn message under 100 words. Include a subject line. Open with something tied to the persona's likely priorities, not a generic compliment. End with a low-friction ask, not a demo request.
+Under 100 words. Include a subject line. Open tied to the persona's priorities. End with a low-friction ask.
 
-## Assumptions / Gaps
-A honest bullet list of anything uncertain, missing, or worth verifying before the call. Include things the rep should try to confirm in the first few minutes of the conversation."""
+## Assumptions and Gaps
+Bullet list of what is uncertain or needs verifying before the call.
+
+"""
 
 
-def build_user_prompt(company_name, persona_title, notes=""):
-    """Combine the task template and output format with the call-specific inputs."""
-    notes_block = f"\n\nContext from the rep:\n{notes}" if notes.strip() else ""
-    task = TASK_PROMPT_TEMPLATE.format(
-        company_name=company_name,
-        persona_title=persona_title,
-        notes_block=notes_block,
-    )
-    return f"{task}\n\n{OUTPUT_FORMAT_TEMPLATE}"
+REVIEW_PROMPT = """Review this sales call brief and flag anything that would make it less useful in a real call.
+
+{brief}
+
+Check for:
+- Pain points or priorities that apply to any company, not this specific one
+- Discovery questions answerable with yes or no
+- Claims presented as fact that should be labeled as assumptions
+- Any section that is too generic to be useful
+
+For each issue, write one line naming it and one line suggesting the fix.
+If a section is strong, skip it.
+If the brief is solid overall, say so in one sentence at the end.
+Keep the review under 150 words."""

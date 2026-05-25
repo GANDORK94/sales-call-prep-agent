@@ -28,26 +28,26 @@ This tool solves that. Give it a company name and a title, and it returns a brie
 
 ## Example output
 
-The following is excerpted from a real briefing generated for a Head of Engineering at a Series B dev tooling company. [See the full output here](output/example_briefing.md).
+The following is excerpted from a real briefing generated for a VP of Sales at Capital One. [See the full output here](output/example_briefing.md), including the Agent Review Notes at the end.
 
 ---
 
 ### Persona
-The Head of Engineering at a company this size typically owns engineering productivity, team structure, and delivery reliability. Day to day, they are navigating sprint planning, cross-functional alignment with product, and keeping engineers unblocked. They are likely measured on shipping velocity, team retention, and their ability to scale the org without introducing process debt.
+This VP likely owns revenue or portfolio targets across a distributed team of AEs or relationship managers, with day-to-day focus on pipeline health, forecast accuracy, and whether their reps are showing up to customer conversations ready to have the right discussion. They are measured on quota attainment and team productivity, which means rep ramp time and call quality inconsistency are personal problems, not abstract ones.
 
 ### Potential Pain Points
-- **Jira overhead eating into engineering time.** When engineers spend meaningful time updating tickets or navigating complex workflows, that is time not spent shipping. At a Series B company, velocity is a competitive advantage, and anything slowing it down has a direct cost.
-- **Lack of visibility into real progress without manual effort.** Getting a clear picture of what is in flight, what is blocked, and what is at risk often requires chasing updates or running standup questions that should already have answers.
+- **Inconsistent call preparation across the team.** When reps do their own research differently, some show up sharp and some show up generic, and the VP has no lever to fix that at scale without a process change.
+- **Managers spending coaching time on basics instead of strategy.** If frontline managers are reviewing decks and coaching reps on who the buyer is, they are not spending time on deal strategy or skill development where it actually matters.
 
 ### Discovery Questions
-1. When your engineers push back on Jira, what specifically are they running into? Is it the day-to-day workflow, the setup and configuration, or something else?
-2. How are you currently getting visibility into what is actually in progress versus what is at risk in a given sprint or cycle?
-3. If you were to replace Jira, what would the team need to see to feel confident the new tool was actually better and not just different?
+1. When you think about your top-performing reps versus the rest of the team, what do you see them doing differently in how they prepare for a first call?
+2. How are your AEs currently researching prospects before discovery calls, and how much time are they typically spending on that?
+3. When a deal stalls after the first call, what do you usually trace it back to in your deal reviews?
 
-### Assumptions and Gaps
-- Headcount is estimated at 50 to 100 engineers. Confirm actual size and growth rate.
-- It is unclear whether the Head of Engineering owns the tooling decision or whether it sits with engineering managers or an internal platform team.
-- No information on whether there is an active evaluation underway. Try to surface this early.
+### Agent Review Notes
+*This section is generated automatically by the self-check step.*
+
+Pain point "High prep time per call" cites a 45-minute figure presented as fact — label as assumption or benchmark, not Capital One-specific data. Discovery questions 1 and 3 can be answered with a short closed response — reframe to "walk me through" to force a real answer. The brief is otherwise strong, especially the Assumptions and Gaps section.
 
 ---
 
@@ -102,15 +102,31 @@ Briefings save to `output/` automatically.
 
 ## How it works
 
-The agent makes one call to Claude per briefing. The prompts are split into three named layers in `prompts.py`:
+The agent runs four steps per briefing, each a separate call to Claude:
 
-- **System prompt** sets the agent's role and rules: think like an SDR/AE hybrid, be specific when you have evidence and general when you do not, label anything uncertain. This layer does not change based on the prospect.
-- **Task prompt template** injects the specific inputs for this call: company name, persona title, and any rep notes.
-- **Output format template** defines the exact seven-section markdown structure the model must follow, with per-section instructions so the model knows what good looks like, not just what the section is called.
+| Step | What it does |
+|---|---|
+| **1. Plan** | Decides the angle to take before generating anything |
+| **2. Context** | Organizes what is known about the company and persona |
+| **3. Brief** | Generates the full seven-section briefing, informed by steps 1 and 2 |
+| **4. Review** | Reads its own output and flags weak spots: generic claims, bad questions, unlabeled assumptions |
 
-Each layer is edited independently. Changing the tone does not touch the output format. Adding a section does not touch the system rules.
+When you run the agent you see each step as it happens:
 
-The `research_company()` function in `agent.py` is a stub that currently returns an empty string. That is the intended extension point: swap the body with a call to a live search API and the rest of the agent does not need to change.
+```
+Preparing briefing for VP of Sales at Capital One...
+
+  Planning approach...
+  Gathering context...
+  Generating briefing...
+  Running self-check...
+
+Done. Briefing saved to: output/capital_one_20260525_1428.md
+```
+
+Each step is a separate function in `agent.py`. Each prompt lives in `prompts.py` and can be edited without touching any other step. A single system prompt applies to all four calls and sets the agent's role and rules.
+
+`gather_context()` in `agent.py` is the intended hook for live web search in v2. Add a search API call there and the results feed directly into the briefing step without changing anything else.
 
 ---
 

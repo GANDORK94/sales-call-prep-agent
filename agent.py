@@ -1,58 +1,131 @@
 """
 Core agent logic for the Sales Call Prep Agent.
 
-Exposes generate_briefing(), which takes a company name, persona title,
-and optional rep notes, and returns a markdown sales call brief.
+Runs a four-step workflow per briefing:
+  1. plan_approach  -- decide the angle before generating
+  2. gather_context -- organize what is known about the company
+  3. generate_brief -- produce the full seven-section briefing
+  4. review_brief   -- flag weak spots in the output
+
+run_agent() is the main entry point. It runs all four steps and returns
+a formatted markdown string ready to save.
+
+Each step is a separate function so they can be read, tested, or swapped
+out independently. To add live web search, extend gather_context().
 """
+
+from datetime import datetime
 
 from anthropic import Anthropic
 
-from prompts import SYSTEM_PROMPT, build_user_prompt
+from prompts import (
+    SYSTEM_PROMPT,
+    PLANNING_PROMPT,
+    CONTEXT_PROMPT,
+    BRIEFING_PROMPT,
+    REVIEW_PROMPT,
+)
 
 MODEL = "claude-sonnet-4-6"
-MAX_TOKENS = 3000
 
 
-def research_company(company_name):
+def _call(client, prompt, max_tokens):
+    """Make a single API call and return the text response."""
+    response = client.messages.create(
+        model=MODEL,
+        max_tokens=max_tokens,
+        system=SYSTEM_PROMPT,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    return response.content[0].text.strip()
+
+
+def plan_approach(client, company_name, persona_title, notes):
+    """Step 1: Plan the angle before generating the brief."""
+    prompt = PLANNING_PROMPT.format(
+        company_name=company_name,
+        persona_title=persona_title,
+        notes=notes or "None provided.",
+    )
+    return _call(client, prompt, max_tokens=400)
+
+
+def gather_context(client, company_name, persona_title, plan):
+    """Step 2: Organize what is known about the company and persona."""
+    prompt = CONTEXT_PROMPT.format(
+        company_name=company_name,
+        persona_title=persona_title,
+        plan=plan,
+    )
+    return _call(client, prompt, max_tokens=600)
+
+
+def generate_brief(client, company_name, persona_title, notes, plan, context):
+    """Step 3: Generate the full seven-section briefing."""
+    prompt = BRIEFING_PROMPT.format(
+        company_name=company_name,
+        persona_title=persona_title,
+        notes=notes or "None provided.",
+        plan=plan,
+        context=context,
+    )
+    return _call(client, prompt, max_tokens=3000)
+
+
+def review_brief(client, brief):
+    """Step 4: Flag weak spots in the generated output."""
+    prompt = REVIEW_PROMPT.format(brief=brief)
+    return _call(client, prompt, max_tokens=400)
+
+
+def format_output(company_name, persona_title, brief, review):
+    """Assemble the final markdown document with metadata and review notes."""
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+    return f"""# Sales Call Brief
+
+**Company:** {company_name}
+**Persona:** {persona_title}
+**Generated:** {timestamp}
+
+---
+
+{brief}
+
+---
+
+## Agent Review Notes
+
+{review}
+"""
+
+
+def run_agent(company_name, persona_title, notes="", on_step=None):
     """
-    Stub for a future live research step.
+    Run the full four-step agent workflow and return formatted markdown.
 
-    Returns an empty string in v1. The model falls back to its training
-    knowledge plus any notes the rep provides.
+    on_step is an optional callback that receives a status string at each step.
+    main.py uses it to print progress without this module knowing about the UI.
 
-    To upgrade: replace the body with a call to Tavily, SerpAPI, Anthropic's
-    built-in web search, or an internal CRM lookup. Return a plain string of
-    relevant context. The rest of the agent does not need to change.
+    To add live web search: gather_context() is the right place to inject it.
+    Pass search results alongside the plan and they will feed directly into
+    the briefing generation step.
     """
-    return ""
-
-
-def generate_briefing(company_name, persona_title, notes=""):
-    """
-    Generate a sales call brief for a single prospect.
-
-    Returns a markdown string with seven sections:
-      - Account
-      - Persona
-      - Likely Priorities
-      - Potential Pain Points
-      - Discovery Questions
-      - Sample Outreach
-      - Assumptions / Gaps
-    """
-    research = research_company(company_name)
-    if research:
-        notes = f"{notes}\n\nResearch context:\n{research}".strip()
-
-    user_prompt = build_user_prompt(company_name, persona_title, notes)
+    def step(msg):
+        if on_step:
+            on_step(msg)
 
     client = Anthropic()
 
-    response = client.messages.create(
-        model=MODEL,
-        max_tokens=MAX_TOKENS,
-        system=SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": user_prompt}],
-    )
+    step("Planning approach...")
+    plan = plan_approach(client, company_name, persona_title, notes)
 
-    return response.content[0].text
+    step("Gathering context...")
+    context = gather_context(client, company_name, persona_title, plan)
+
+    step("Generating briefing...")
+    brief = generate_brief(client, company_name, persona_title, notes, plan, context)
+
+    step("Running self-check...")
+    review = review_brief(client, brief)
+
+    return format_output(company_name, persona_title, brief, review)
