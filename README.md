@@ -1,114 +1,236 @@
 # Sales Call Prep Agent
 
-A lightweight CLI tool that turns a company name, a prospect's role, and a few notes into a complete pre-call briefing. Built for sales reps who want to walk into discovery calls already two steps ahead.
+A Python command-line tool that turns a company name, a prospect's job title, and a few optional notes into a structured pre-call briefing. It runs in under 30 seconds and saves every output as a timestamped markdown file you can read before picking up the phone.
+
+---
+
+## Why I built this
+
+I spent several years in sales before moving into AI-enabled workflows. Before every discovery call, the prep was manual and inconsistent. Sometimes I spent twenty minutes researching. Sometimes I walked in cold. The quality of preparation depended entirely on how much time I had that day, which meant it never scaled.
+
+This tool solves that problem. Give it a company name and a job title, and it returns a structured briefing that tells you what the person likely cares about, what questions will open a real conversation, and, just as importantly, what you do not yet know and should verify before the call.
+
+The second goal was to build something that demonstrates how to design a practical AI workflow, not just call an API and dump unstructured text.
+
+---
+
+## Who it's for
+
+- **Sales reps and SDRs** who want structured, consistent prep without spending twenty minutes on LinkedIn and Crunchbase before every call.
+- **Account executives** who need a fast way to get up to speed on a new account before a handoff call.
+- **Hiring managers and technical interviewers** evaluating a candidate who has built and shipped an end-to-end AI workflow.
+- **Developers** looking for a practical example of prompt architecture and Claude API integration.
+
+---
+
+## Features
+
+- Generates a seven-section pre-call briefing from minimal input
+- Flags inferences and uncertain claims with "(Assumption)" or "(Needs verification)" rather than presenting guesses as fact
+- Includes a dedicated Assumptions and Gaps section so reps know what to confirm in the first few minutes of the call
+- Saves every briefing as a timestamped markdown file so nothing gets lost
+- Three input modes: interactive prompts, JSON file, or command-line flags
+- Prompt architecture split into three independent layers, making it easy to tune tone, sections, or output structure without rewriting the whole thing
+
+---
 
 ## What it produces
 
-For every account you point it at, you get a single markdown briefing with:
+Each briefing contains seven sections:
 
-1. **Account snapshot**: what the company does, who they serve, and where they sit in the market.
-2. **Persona profile**: what this specific role owns, cares about, and is measured on.
-3. **Likely priorities**: what this person is probably focused on right now.
-4. **Potential pain points**: 3 to 5 problems specific to the role and company, each with a commercial why-it-matters line.
-5. **Discovery questions**: 5 open-ended questions tailored to the persona.
-6. **Sample outreach**: a short email or LinkedIn message under 100 words.
-7. **Assumptions and gaps**: an honest list of what is uncertain or needs verifying before the call.
+| Section | What it contains |
+|---|---|
+| **Account** | What the company does, who they serve, and their current situation |
+| **Persona** | What this role owns, cares about day-to-day, and is measured on |
+| **Likely Priorities** | What this person is probably focused on right now |
+| **Potential Pain Points** | 3 to 5 role-specific problems, each with a commercial why-it-matters line |
+| **Discovery Questions** | 5 open-ended questions that surface real problems and decision criteria |
+| **Sample Outreach** | A cold email or LinkedIn message under 100 words with a low-friction ask |
+| **Assumptions and Gaps** | An honest list of what is uncertain or needs verifying before the call |
 
-Output saves to `output/[company]_[timestamp].md` so every briefing is preserved.
+---
 
-## Why this exists
+## How it works
 
-Most cold calls and discovery calls suffer from one thing: the rep walked in cold. This tool gives you a structured, repeatable prep flow in under a minute, so you spend your time selling, not researching.
+The agent makes one call to Claude per briefing. The prompts are structured in three layers, each with a distinct job:
 
-## What changed in v2 (and why)
+**System prompt** sets the agent's role and rules. It tells Claude to think like a strong SDR/AE hybrid: concise, commercially aware, and honest about uncertainty. This layer is stable and does not change based on the prospect.
 
-The first version of this tool worked, but the output it produced was generic. It gave you a company overview and some pain points, but they could have applied to almost any company in that category. A rep reading it before a call would not feel meaningfully more prepared than one who had done a quick Google search.
+**Task prompt template** injects the specific inputs for this call: company name, persona title, and any rep notes. It tells the model what to do with those inputs.
 
-The v2 update was about making the output actually useful, not just complete.
+**Output format template** defines the exact seven-section markdown structure the model must follow. Each section has a brief instruction so the model knows what "good" looks like, not just what the section is called.
 
-Three things changed:
+These three layers are defined separately in `prompts.py`. If you want to change the tone, you edit the system prompt. If you want to add a new section, you edit the output format. Nothing bleeds into anything else.
 
-**The agent now thinks like a seller, not a researcher.** The original prompt told the AI to behave like a "B2B sales strategist." The new one tells it to think like an SDR/AE hybrid: someone who has been on hundreds of calls, knows what questions open conversations, and can spot the difference between a real pain and a polite complaint. That shift in framing changes the tone and specificity of everything it produces.
+The `research_company()` function in `agent.py` is currently a stub that returns an empty string. In this version, Claude draws on its training knowledge plus whatever notes the rep provides. The stub is the intended extension point for v2: swap the body of that function with a call to a live search tool (Tavily, SerpAPI, or Anthropic's built-in web search) and the rest of the agent does not need to change.
 
-**The output now flags what it does not know.** The original briefings presented everything with the same confidence, even when the AI was guessing. The new version labels inferences as "Assumption" and adds a dedicated section called Assumptions and Gaps at the end. This matters because walking into a call with false confidence is worse than walking in knowing what you still need to find out. The gaps section tells the rep exactly what to verify in the first few minutes of the conversation.
+---
 
-**The prompts were split into three separate layers.** Previously, all the instructions to the AI were bundled together in one block. Now they are separated into three distinct pieces: one that defines the agent's role and rules, one that describes the specific task for each call, and one that defines the exact structure of the output. This makes the tool easier to improve over time. If the tone feels off, you change one layer. If you want to add a new section to the briefing, you change a different layer. Nothing bleeds into anything else.
+## Tech stack
 
-The result is a briefing that reads less like a Wikipedia summary and more like prep notes from a colleague who has already done the homework.
+| Tool | Purpose |
+|---|---|
+| Python 3.9+ | Core language |
+| [Anthropic Python SDK](https://github.com/anthropics/anthropic-sdk-python) | Claude API client |
+| Claude Sonnet (claude-sonnet-4-6) | Language model |
+| python-dotenv | Loads the API key from a local `.env` file |
 
-## Setup
+No frameworks. No databases. No web server. The entire tool is four Python files and two dependencies.
 
-Requires Python 3.9 or later and an Anthropic API key.
-
-```bash
-git clone <this-repo>
-cd sales-call-prep-agent
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
-
-Set your API key by creating a `.env` file in the project root:
-
-```
-ANTHROPIC_API_KEY=your_key_here
-```
-
-## Usage
-
-Three ways to run it.
-
-**Interactive (easiest):**
-
-```bash
-python main.py
-```
-
-**From a JSON file:**
-
-```bash
-python main.py --input sample_input.json
-```
-
-**From command-line flags:**
-
-```bash
-python main.py --company "Acme Logistics" --persona "VP of Operations" --notes "Mid-market 3PL, expanded into last-mile."
-```
-
-Generated briefings land in `output/` as timestamped markdown files.
+---
 
 ## File structure
 
 ```
 sales-call-prep-agent/
-├── main.py              # CLI entry, input handling, file output
-├── agent.py             # Core agent: calls the LLM, returns markdown
-├── prompts.py           # All prompts: system, task template, output format
-├── sample_input.json    # Example input
-├── requirements.txt     # Dependencies
+├── main.py              # CLI entry point: handles input modes and saves output
+├── agent.py             # Calls the Claude API and returns a markdown briefing
+├── prompts.py           # Three-layer prompt architecture: system, task, output format
+├── sample_input.json    # Example JSON input for quick testing
+├── requirements.txt     # anthropic and python-dotenv
 ├── README.md
-└── output/              # Generated briefings land here
+└── output/              # Generated briefings saved here as timestamped .md files
 ```
 
-## How it works
+---
 
-The agent makes one call to Claude per briefing. The prompts are split into three layers in `prompts.py`:
+## Example input
 
-- **System prompt**: sets the agent's role, tone, and rules (stable across every call).
-- **Task prompt template**: describes what to do with the specific company, persona, and notes for this call.
-- **Output format template**: defines the exact seven-section markdown structure the model must follow.
+**From a JSON file:**
 
-`research_company()` in `agent.py` is a stub that returns an empty string in v1, so the model draws on its training knowledge plus whatever notes the rep provides. To plug in live web search later, swap the body of that function with a call to your preferred source (Tavily, SerpAPI, Anthropic's built-in web search, an internal CRM lookup, etc.). Nothing else needs to change.
+```json
+{
+  "company": "Acme Logistics",
+  "persona": "VP of Operations",
+  "notes": "Mid-market 3PL based in the Midwest. Recently expanded into last-mile delivery. We sell route optimization software that reduces fuel costs and missed delivery windows."
+}
+```
 
-## Roadmap (v2 ideas)
+**From the command line:**
 
-- Wire `research_company()` into a live web search tool for richer, more current context.
-- Add LinkedIn or company-news lookup for the prospect specifically.
-- Multi-account batch mode: feed a CSV of accounts, get back a folder of briefings.
-- Push briefings into a CRM (HubSpot, Salesforce) instead of, or in addition to, local markdown.
-- A second-pass critic that tightens the outreach and pressure-tests the discovery questions.
-- A small evaluation harness so prompt changes can be A/B tested across a fixed set of accounts.
+```bash
+python main.py --company "Acme Logistics" --persona "VP of Operations" --notes "Mid-market 3PL, expanded into last-mile."
+```
+
+---
+
+## Example output
+
+The following is an excerpt from a real briefing generated for a Head of Engineering at a Series B dev tooling company.
+
+---
+
+**## Persona**
+The Head of Engineering at a company this size typically owns engineering productivity, team structure, and delivery reliability. Day to day, they are navigating sprint planning, cross-functional alignment with product, and keeping engineers unblocked. They are likely measured on shipping velocity, team retention, and their ability to scale the org without introducing process debt.
+
+**## Potential Pain Points**
+- **Jira overhead eating into engineering time.** When engineers spend meaningful time updating tickets or navigating complex workflows, that is time not spent shipping. At a Series B company, velocity is a competitive advantage, and anything slowing it down has a direct cost.
+- **Tooling that does not reflect how modern engineering teams actually work.** If the workflow does not match how the team thinks, engineers route around it, which means the data in the tool becomes unreliable for the Head of Engineering trying to understand delivery health.
+- **Constant team complaints becoming a management distraction.** If engineers are vocal about tooling frustration, the Head of Engineering is fielding that feedback and choosing between fixing it or absorbing the morale cost.
+
+**## Discovery Questions**
+1. When your engineers push back on Jira, what specifically are they running into? Is it the day-to-day workflow, the setup and configuration, or something else?
+2. How are you currently getting visibility into what is actually in progress versus what is at risk in a given sprint or cycle?
+3. If you were to replace Jira, what would the team need to see to feel confident the new tool was actually better and not just different?
+
+**## Assumptions and Gaps**
+- Headcount is estimated at 50 to 100 engineers. Confirm actual size and growth rate.
+- It is unclear whether the Head of Engineering owns the tooling decision or whether it sits with engineering managers, a VP of Engineering, or an internal platform team.
+- No information on whether there is an active evaluation underway or a budget cycle approaching. Try to surface this early.
+
+---
+
+## How to run locally
+
+**1. Clone the repo and navigate into it**
+
+```bash
+git clone https://github.com/GANDORK94/sales-call-prep-agent.git
+cd sales-call-prep-agent
+```
+
+**2. Create and activate a virtual environment**
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+**3. Install dependencies**
+
+```bash
+pip install -r requirements.txt
+```
+
+**4. Add your Anthropic API key**
+
+Create a `.env` file in the project root:
+
+```
+ANTHROPIC_API_KEY=your_key_here
+```
+
+Get a key at [console.anthropic.com](https://console.anthropic.com). You will need a small amount of API credit. A $5 top-up runs hundreds of briefings.
+
+**5. Run the agent**
+
+```bash
+python main.py --input sample_input.json
+```
+
+Or interactively:
+
+```bash
+python main.py
+```
+
+The briefing saves to `output/` automatically.
+
+---
+
+## Limitations
+
+- **No live web search.** The agent draws on Claude's training knowledge and whatever notes you provide. It does not look up current news, recent funding rounds, or live job postings. The `research_company()` function in `agent.py` is the intended hook for adding this in v2.
+- **One briefing per run.** Batch mode (feed a CSV, get back a folder of briefings) is not yet implemented.
+- **Output quality depends on input quality.** A company name alone produces a generic briefing. The more context you give in the notes field, the more specific and useful the output.
+- **No CRM integration.** Briefings save as local markdown files. Pushing them into HubSpot, Salesforce, or a shared drive is a future improvement.
+
+---
+
+## Future improvements
+
+- Wire `research_company()` into a live search API (Tavily, SerpAPI, or Anthropic's built-in web search) for current, sourced context.
+- Add LinkedIn profile or recent news lookup for the specific prospect.
+- Batch mode: accept a CSV of accounts and output a folder of briefings.
+- CRM integration: push briefings directly into HubSpot or Salesforce as notes on the contact record.
+- A second-pass review step that tightens the outreach draft and pressure-tests the discovery questions.
+- An evaluation harness so prompt changes can be tested against a fixed set of sample accounts before being deployed.
+
+---
+
+## Why this project matters
+
+### What it demonstrates technically
+
+This project is a practical example of how to design a structured AI workflow rather than just write a prompt and hope for the best.
+
+Most early AI projects make one mistake: they treat the language model as a magic box where you put a question in and get an answer out. That works for simple tasks but breaks down quickly when you need consistent, structured, trustworthy output at scale.
+
+This agent was built with a different approach:
+
+**Separation of concerns in the prompt layer.** The instructions to the model are split into three named layers: one that defines the agent's role and rules, one that describes the task for this specific call, and one that defines the exact output structure. Each layer can be edited independently. This is the same kind of thinking that makes software maintainable: you should be able to change the tone of the agent without accidentally changing its output format.
+
+**Epistemic honesty as a design requirement.** The agent is explicitly instructed to label uncertain claims as "Assumption" or "Needs verification" and to surface everything it does not know in a dedicated section. This is not a minor detail. An agent that presents guesses with the same confidence as known facts is not useful in a professional context. Building in honesty as a rule, not an afterthought, is one of the things that separates a usable tool from a demo.
+
+**A clean extension point for tool use.** The `research_company()` function is currently a stub. Its job is to return context about the company before the prompt is built. In v2, that function becomes the agent's tool call: a live web search, a CRM lookup, a news API. The rest of the system does not change. This reflects how real agentic systems are designed: the reasoning loop stays stable while the tools it can call expand over time.
+
+### What it demonstrates professionally
+
+This project was built by someone who has sat on the phone doing discovery calls and knows what a useful briefing actually looks like versus one that sounds good but does not help. The output sections, the assumptions flagging, and the Assumptions and Gaps section at the end are not arbitrary design choices. They reflect what a rep actually needs before a call: what to anchor the conversation on, what questions to ask, and what they do not yet know.
+
+Building a tool that solves a problem you have personally experienced, and designing it well enough to extend it, is the point.
+
+---
 
 ## License
 
