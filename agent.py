@@ -1,8 +1,8 @@
 """
 Core agent logic for the Sales Call Prep Agent.
 
-Exposes generate_briefing(), which takes a company name, prospect persona,
-and optional notes, and returns a markdown-formatted call prep briefing.
+Exposes generate_briefing(), which takes a company name, persona title,
+and optional rep notes, and returns a markdown sales call brief.
 """
 
 from anthropic import Anthropic
@@ -10,40 +10,43 @@ from anthropic import Anthropic
 from prompts import SYSTEM_PROMPT, build_user_prompt
 
 MODEL = "claude-sonnet-4-6"
-MAX_TOKENS = 2500
+MAX_TOKENS = 3000
 
 
-def research_company(company):
+def research_company(company_name):
     """
-    Optional research step. Returns context about the company that gets
-    passed into the prompt.
+    Stub for a future live research step.
 
-    In v1 this is a stub and returns an empty string. The model relies on its
-    training knowledge plus any notes the rep provides.
+    Returns an empty string in v1. The model falls back to its training
+    knowledge plus any notes the rep provides.
 
-    To upgrade in v2, plug in a search tool here (Tavily, SerpAPI, Anthropic's
-    built-in web search, an internal CRM lookup, etc.) and return a string of
-    relevant context. Keep the function signature stable so the rest of the
-    agent does not need to change.
+    To upgrade: replace the body with a call to Tavily, SerpAPI, Anthropic's
+    built-in web search, or an internal CRM lookup. Return a plain string of
+    relevant context. The rest of the agent does not need to change.
     """
     return ""
 
 
-def generate_briefing(company, persona, notes=""):
+def generate_briefing(company_name, persona_title, notes=""):
     """
-    Generate a full sales call prep briefing for a single account.
+    Generate a sales call brief for a single prospect.
 
-    Returns a markdown string with five sections:
-      1. Company Overview
-      2. Likely Pain Points
-      3. Discovery Questions
-      4. Sample Cold Email
-      5. Pre-Call Briefing
+    Returns a markdown string with seven sections:
+      - Account
+      - Persona
+      - Likely Priorities
+      - Potential Pain Points
+      - Discovery Questions
+      - Sample Outreach
+      - Assumptions / Gaps
     """
-    research = research_company(company)
-    user_prompt = build_user_prompt(company, persona, notes, research)
+    research = research_company(company_name)
+    if research:
+        notes = f"{notes}\n\nResearch context:\n{research}".strip()
 
-    client = Anthropic()  # Reads ANTHROPIC_API_KEY from the environment
+    user_prompt = build_user_prompt(company_name, persona_title, notes)
+
+    client = Anthropic()
 
     response = client.messages.create(
         model=MODEL,
