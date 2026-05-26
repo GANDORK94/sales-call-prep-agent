@@ -189,6 +189,3 @@ Three specific decisions worth noting:
 
 ---
 
-## License
-
-MIT
