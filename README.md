@@ -53,64 +53,123 @@ Pain point "High prep time per call" cites a 45-minute figure presented as fact 
 
 ## How to run locally
 
-**1. Clone the repo and move into the project folder**
+You will do everything through the Terminal app on your Mac. No coding experience needed — just copy and paste each command exactly as shown.
+
+---
+
+### Step 1 — Open Terminal
+
+Press **Command + Space**, type **Terminal**, and hit Enter. A black or white window will open with a `%` prompt. That is where you type commands.
+
+---
+
+### Step 2 — Download the project
+
+Copy and paste this command, then hit Enter:
 
 ```bash
-git clone https://github.com/GANDORK94/sales-call-prep-agent.git
-cd sales-call-prep-agent
+git clone https://github.com/GANDORK94/sales-call-prep-agent.git ~/Desktop/sales-call-prep-agent
 ```
 
-> **Every command from this point on must be run from inside the `sales-call-prep-agent` folder.** If you open a new terminal window at any point, run `cd sales-call-prep-agent` again before continuing.
+This saves the project to your Desktop.
 
-**2. Create and activate a virtual environment**
+---
+
+### Step 3 — Navigate into the project folder
+
+```bash
+cd ~/Desktop/sales-call-prep-agent
+```
+
+> **Important:** You must run this command every time you open a new Terminal window before doing anything else. Think of it as "opening the project folder" — all other commands only work from inside it.
+
+---
+
+### Step 4 — Set up a Python environment
+
+Copy and paste both lines, hitting Enter after each:
 
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
 
-Your prompt will change to show `(venv)` — that means the environment is active. On macOS, use `python3`, not `python`.
+After the second line, your prompt will change to start with `(venv)`. That means it worked. You will need to run `source venv/bin/activate` again any time you open a new Terminal window.
 
-> If you close and reopen your terminal, you will need to re-activate the virtual environment: `cd sales-call-prep-agent` then `source venv/bin/activate`.
+---
 
-**3. Install dependencies**
+### Step 5 — Install the required packages
 
 ```bash
 pip install -r requirements.txt
 ```
 
-**4. Add your Anthropic API key**
+This only needs to be done once.
 
-Create a `.env` file in the project root:
+---
+
+### Step 6 — Add your API key
+
+The tool uses Claude to generate briefings. You need a free API key from Anthropic.
+
+1. Go to [console.anthropic.com](https://console.anthropic.com) and create an account
+2. Get your API key from the dashboard
+3. In the project folder, create a file called `.env` and add this line:
 
 ```
 ANTHROPIC_API_KEY=your_key_here
 ```
 
-Get a key at [console.anthropic.com](https://console.anthropic.com). A $5 credit top-up runs hundreds of briefings.
+Replace `your_key_here` with your actual key. A $5 credit top-up runs hundreds of briefings.
 
-**5. Run it**
+To create the `.env` file from Terminal:
 
 ```bash
-# From a JSON file
-python3 main.py --input sample_input.json
+echo 'ANTHROPIC_API_KEY=your_key_here' > .env
+```
 
-# From command-line flags
-python3 main.py --company "Acme Logistics" --persona "VP of Operations" --notes "Mid-market 3PL, expanded into last-mile."
+Replace `your_key_here` with your actual key before running it.
 
-# Interactive
+---
+
+### Step 7 — Run it
+
+```bash
 python3 main.py
 ```
 
-Briefings save to `output/` automatically.
+The tool will ask you for a company name, a job title, and any notes. Fill those in and it will generate your briefing. Output saves automatically to the `output/` folder on your Desktop inside the project.
 
-**Troubleshooting**
+You can also run it with everything on one line:
 
-| Error | Fix |
+```bash
+python3 main.py --company "Acme Logistics" --persona "VP of Operations" --notes "Mid-market 3PL, expanded into last-mile."
+```
+
+---
+
+### Every time you come back
+
+Open Terminal and run these two lines before anything else:
+
+```bash
+cd ~/Desktop/sales-call-prep-agent
+source venv/bin/activate
+```
+
+Then run `python3 main.py` to generate a briefing.
+
+---
+
+### Something went wrong?
+
+| What you see | What to do |
 |---|---|
-| `can't open file 'main.py'` | You are not in the project folder. Run `cd ~/Desktop/sales-call-prep-agent` first. |
-| `No module named 'dotenv'` | Virtual environment is not active or dependencies are not installed. Run steps 2 and 3 again. |
-| `No such file or directory: 'requirements.txt'` | You are running `pip install` from the wrong folder. Run `cd ~/Desktop/sales-call-prep-agent` first. |
+| `no such file or directory: sales-call-prep-agent` | You skipped Step 3. Run `cd ~/Desktop/sales-call-prep-agent` |
+| `can't open file 'main.py'` | You are not in the project folder. Run `cd ~/Desktop/sales-call-prep-agent` |
+| `No such file or directory: 'requirements.txt'` | Same fix — run `cd ~/Desktop/sales-call-prep-agent` first |
+| `No module named 'dotenv'` | Run `source venv/bin/activate` then `pip install -r requirements.txt` |
+| `AuthenticationError` | Your API key is missing or incorrect. Check your `.env` file |
 
 ---
 
