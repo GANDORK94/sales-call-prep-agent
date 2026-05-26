@@ -105,10 +105,6 @@ def run_agent(company_name, persona_title, notes="", on_step=None):
 
     on_step is an optional callback that receives a status string at each step.
     main.py uses it to print progress without this module knowing about the UI.
-
-    To add live web search: gather_context() is the right place to inject it.
-    Pass search results alongside the plan and they will feed directly into
-    the briefing generation step.
     """
     def step(msg):
         if on_step:

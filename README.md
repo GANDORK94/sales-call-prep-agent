@@ -132,7 +132,7 @@ Each step is a separate function in `agent.py`. Each prompt lives in `prompts.py
 
 ## Tech stack
 
-| | |
+| Tool | Purpose |
 |---|---|
 | Python 3.9+ | Core language |
 | [Anthropic Python SDK](https://github.com/anthropics/anthropic-sdk-python) | Claude API client |
@@ -149,7 +149,7 @@ No frameworks. No databases. Four Python files and two dependencies.
 sales-call-prep-agent/
 ├── main.py              # CLI entry point: input modes, validation, file output
 ├── agent.py             # Calls the Claude API, returns markdown
-├── prompts.py           # Three-layer prompt architecture: system, task, format
+├── prompts.py           # One prompt per agent step plus a shared system prompt
 ├── sample_input.json    # Example input for quick testing
 ├── requirements.txt     # Dependencies
 └── output/
@@ -160,7 +160,7 @@ sales-call-prep-agent/
 
 ## Limitations
 
-- **No live web search.** The agent draws on Claude's training knowledge plus whatever notes you provide. It does not fetch current news, recent funding rounds, or live job postings. The `research_company()` stub in `agent.py` is the hook for adding this later.
+- **No live web search.** The agent draws on Claude's training knowledge plus whatever notes you provide. It does not fetch current news, recent funding rounds, or live job postings. `gather_context()` in `agent.py` is the intended hook for adding this in v2.
 - **One briefing per run.** Batch mode is not yet implemented.
 - **Output quality scales with input quality.** A company name alone produces a more generic briefing than one with specific rep notes.
 - **No CRM integration.** Briefings save as local markdown files.
@@ -169,7 +169,7 @@ sales-call-prep-agent/
 
 ## Future improvements
 
-- Connect `research_company()` to a live search API (Tavily, SerpAPI, or Anthropic's web search tool) for current, sourced context
+- Connect `gather_context()` to a live search API (Tavily, SerpAPI, or Anthropic's web search tool) for current, sourced context
 - Add LinkedIn profile or recent news lookup for the specific prospect
 - Batch mode: accept a CSV of accounts, output a folder of briefings
 - CRM push: write briefings directly into HubSpot or Salesforce as contact notes
@@ -179,7 +179,13 @@ sales-call-prep-agent/
 
 ## Design notes
 
-The most common mistake in early AI projects is treating the model as a black box: put a question in, get an answer out, ship it. That breaks down when you need consistent, structured, trustworthy output across many different inputs. This project is built around three deliberate choices. First, the prompts are split into separate layers so tone, task, and output structure can each be changed without affecting the others. Second, the agent is explicitly instructed to label inferences as assumptions and surface uncertainty in a dedicated section, because a briefing that presents guesses as facts is worse than no briefing. Third, the research function is a named stub, not an afterthought, because the right place to extend an agent's capabilities is a defined interface, not a scattered rewrite. These are the same decisions that make any software system easier to maintain and extend over time.
+What makes this an agent rather than a script: each step uses the output of the previous one as input, the system plans before it generates, and it reviews its own output before returning anything. The workflow is sequential and stateful, not a single prompt with a single response.
+
+Three specific decisions worth noting:
+
+- **Prompts are separated by step, not bundled.** Changing the tone of the planning step does not affect the briefing format. Adding a new output section does not touch the system rules. Each layer can be changed independently.
+- **Uncertainty is a first-class output.** The agent is instructed to label inferences as assumptions and surface everything it does not know in a dedicated section. A briefing that presents guesses as facts is worse than no briefing.
+- **The extension point is named.** `gather_context()` in `agent.py` is where live search goes when this gets upgraded. It is a defined interface, not a comment in a README.
 
 ---
 

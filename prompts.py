@@ -106,9 +106,7 @@ Exactly 5 open-ended questions. No yes or no questions. No leading questions. Sh
 Under 100 words. Include a subject line. Open tied to the persona's priorities. End with a low-friction ask.
 
 ## Assumptions and Gaps
-Bullet list of what is uncertain or needs verifying before the call.
-
-"""
+Bullet list of what is uncertain or needs verifying before the call."""
 
 
 REVIEW_PROMPT = """Review this sales call brief and flag anything that would make it less useful in a real call.
