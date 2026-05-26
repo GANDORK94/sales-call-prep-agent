@@ -60,7 +60,7 @@ git clone https://github.com/GANDORK94/sales-call-prep-agent.git
 cd sales-call-prep-agent
 ```
 
-Stay in this folder for all remaining steps. Every command below assumes you are inside `sales-call-prep-agent/`.
+> **Every command from this point on must be run from inside the `sales-call-prep-agent` folder.** If you open a new terminal window at any point, run `cd sales-call-prep-agent` again before continuing.
 
 **2. Create and activate a virtual environment**
 
@@ -70,6 +70,8 @@ source venv/bin/activate
 ```
 
 Your prompt will change to show `(venv)` — that means the environment is active. On macOS, use `python3`, not `python`.
+
+> If you close and reopen your terminal, you will need to re-activate the virtual environment: `cd sales-call-prep-agent` then `source venv/bin/activate`.
 
 **3. Install dependencies**
 
