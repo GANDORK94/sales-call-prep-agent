@@ -53,12 +53,14 @@ Pain point "High prep time per call" cites a 45-minute figure presented as fact 
 
 ## How to run locally
 
-**1. Clone the repo**
+**1. Clone the repo and move into the project folder**
 
 ```bash
 git clone https://github.com/GANDORK94/sales-call-prep-agent.git
 cd sales-call-prep-agent
 ```
+
+Stay in this folder for all remaining steps. Every command below assumes you are inside `sales-call-prep-agent/`.
 
 **2. Create and activate a virtual environment**
 
@@ -66,6 +68,8 @@ cd sales-call-prep-agent
 python3 -m venv venv
 source venv/bin/activate
 ```
+
+Your prompt will change to show `(venv)` — that means the environment is active. On macOS, use `python3`, not `python`.
 
 **3. Install dependencies**
 
@@ -87,16 +91,24 @@ Get a key at [console.anthropic.com](https://console.anthropic.com). A $5 credit
 
 ```bash
 # From a JSON file
-python main.py --input sample_input.json
+python3 main.py --input sample_input.json
 
 # From command-line flags
-python main.py --company "Acme Logistics" --persona "VP of Operations" --notes "Mid-market 3PL, expanded into last-mile."
+python3 main.py --company "Acme Logistics" --persona "VP of Operations" --notes "Mid-market 3PL, expanded into last-mile."
 
 # Interactive
-python main.py
+python3 main.py
 ```
 
 Briefings save to `output/` automatically.
+
+**Troubleshooting**
+
+| Error | Fix |
+|---|---|
+| `can't open file 'main.py'` | You are not in the project folder. Run `cd ~/Desktop/sales-call-prep-agent` first. |
+| `No module named 'dotenv'` | Virtual environment is not active or dependencies are not installed. Run steps 2 and 3 again. |
+| `No such file or directory: 'requirements.txt'` | You are running `pip install` from the wrong folder. Run `cd ~/Desktop/sales-call-prep-agent` first. |
 
 ---
 
