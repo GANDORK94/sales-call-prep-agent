@@ -148,6 +148,34 @@ python3 main.py --company "Acme Logistics" --persona "VP of Operations" --notes 
 
 ---
 
+### Step 8 — View your output
+
+Briefings save as `.md` files in the `output/` folder. To read one in the Terminal without needing VS Code or any other app installed, use one of these commands.
+
+**List all saved briefings:**
+
+```bash
+ls output/
+```
+
+**Read a file (prints the whole thing at once):**
+
+```bash
+cat output/filename.md
+```
+
+**Read a file with scroll controls (better for long files):**
+
+```bash
+less output/filename.md
+```
+
+Use the arrow keys to scroll. Press `q` to exit.
+
+Replace `filename.md` with the name shown when you ran `ls output/`.
+
+---
+
 ### Every time you come back
 
 Open Terminal and run these two lines before anything else:
