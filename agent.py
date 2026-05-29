@@ -15,6 +15,7 @@ out independently. To add live web search, extend gather_context().
 """
 
 from datetime import datetime
+from pathlib import Path
 
 from anthropic import Anthropic
 
@@ -97,6 +98,21 @@ def format_output(company_name, persona_title, brief, review):
 
 {review}
 """
+
+
+def save_output(content, company):
+    """Save a finished brief to output/ as a timestamped markdown file.
+
+    Shared by both the CLI (main.py) and the web app (app.py) so a briefing
+    is saved the same way no matter which one generated it. Returns the path.
+    """
+    output_dir = Path("output")
+    output_dir.mkdir(exist_ok=True)
+    slug = company.lower().replace(" ", "_").replace("/", "_").replace(".", "")
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+    filepath = output_dir / f"{slug}_{timestamp}.md"
+    filepath.write_text(content, encoding="utf-8")
+    return filepath
 
 
 def run_agent(company_name, persona_title, notes="", on_step=None):

@@ -1,6 +1,6 @@
 # Sales Call Prep Agent
 
-A Python CLI tool that turns a company name, a prospect's job title, and a few optional notes into a structured pre-call briefing. Runs in under 30 seconds. Output saves as a timestamped markdown file.
+A Python tool that turns a company name, a prospect's job title, and a few optional notes into a structured pre-call briefing. Runs in under 30 seconds. Use it two ways: a terminal version that saves the brief as a timestamped markdown file, or a local website with a simple form.
 
 ---
 
@@ -51,6 +51,17 @@ Pain point "High prep time per call" cites a 45-minute figure presented as fact 
 
 ---
 
+## Two ways to run it
+
+This project shares one engine (`agent.py`) behind two launchers:
+
+- **`main.py`** — the terminal version. Asks you questions, saves the brief to the `output/` folder.
+- **`app.py`** — a local website. Fill in a form in your browser, read the brief on the page.
+
+Setup is the same for both. You only change the last command depending on which one you want.
+
+---
+
 ## How to run locally
 
 You will do everything through the Terminal app on your Mac. No coding experience needed — just copy and paste each command exactly as shown.
@@ -68,17 +79,17 @@ Press **Command + Space**, type **Terminal**, and hit Enter. A black or white wi
 Copy and paste this command, then hit Enter:
 
 ```bash
-git clone https://github.com/GANDORK94/sales-call-prep-agent.git ~/Desktop/sales-call-prep-agent
+git clone https://github.com/patrickalowe/sales-call-prep-agent.git ~/Projects/sales-call-prep
 ```
 
-This saves the project to your Desktop.
+This saves the project to a `Projects` folder in your home directory.
 
 ---
 
 ### Step 3 — Navigate into the project folder
 
 ```bash
-cd ~/Desktop/sales-call-prep-agent
+cd ~/Projects/sales-call-prep
 ```
 
 > **Important:** You must run this command every time you open a new Terminal window before doing anything else. Think of it as "opening the project folder" — all other commands only work from inside it.
@@ -110,7 +121,7 @@ This only needs to be done once.
 
 ### Step 6 — Add your API key
 
-The tool uses Claude to generate briefings. You need a free API key from Anthropic.
+The tool uses Claude to generate briefings. You need an API key from Anthropic.
 
 1. Go to [console.anthropic.com](https://console.anthropic.com) and create an account
 2. Get your API key from the dashboard
@@ -134,11 +145,13 @@ Replace `your_key_here` with your actual key before running it.
 
 ### Step 7 — Run it
 
+**Terminal version:**
+
 ```bash
 python3 main.py
 ```
 
-The tool will ask you for a company name, a job title, and any notes. Fill those in and it will generate your briefing. Output saves automatically to the `output/` folder on your Desktop inside the project.
+The tool will ask you for a company name, a job title, and any notes. Fill those in and it will generate your briefing. Output saves automatically to the `output/` folder.
 
 You can also run it with everything on one line:
 
@@ -146,11 +159,19 @@ You can also run it with everything on one line:
 python3 main.py --company "Acme Logistics" --persona "VP of Operations" --notes "Mid-market 3PL, expanded into last-mile."
 ```
 
+**Website version:**
+
+```bash
+python3 app.py
+```
+
+Then open **http://localhost:5001** in your browser. Fill in the form and the briefing appears on the page. Press `Control + C` in the Terminal to stop the website when you are done.
+
 ---
 
-### Step 8 — View your output
+### Step 8 — View your output (terminal version)
 
-Briefings save as `.md` files in the `output/` folder. To read one in the Terminal without needing VS Code or any other app installed, use one of these commands.
+Briefings save as `.md` files in the `output/` folder. To read one in the Terminal without needing any other app installed:
 
 **List all saved briefings:**
 
@@ -158,21 +179,13 @@ Briefings save as `.md` files in the `output/` folder. To read one in the Termin
 ls output/
 ```
 
-**Read a file (prints the whole thing at once):**
-
-```bash
-cat output/filename.md
-```
-
-**Read a file with scroll controls (better for long files):**
+**Read a file with scroll controls:**
 
 ```bash
 less output/filename.md
 ```
 
-Use the arrow keys to scroll. Press `q` to exit.
-
-Replace `filename.md` with the name shown when you ran `ls output/`.
+Use the arrow keys to scroll. Press `q` to exit. Replace `filename.md` with the name shown when you ran `ls output/`.
 
 ---
 
@@ -181,11 +194,11 @@ Replace `filename.md` with the name shown when you ran `ls output/`.
 Open Terminal and run these two lines before anything else:
 
 ```bash
-cd ~/Desktop/sales-call-prep-agent
+cd ~/Projects/sales-call-prep
 source venv/bin/activate
 ```
 
-Then run `python3 main.py` to generate a briefing.
+Then run `python3 main.py` (terminal) or `python3 app.py` (website).
 
 ---
 
@@ -193,11 +206,11 @@ Then run `python3 main.py` to generate a briefing.
 
 | What you see | What to do |
 |---|---|
-| `no such file or directory: sales-call-prep-agent` | You skipped Step 3. Run `cd ~/Desktop/sales-call-prep-agent` |
-| `can't open file 'main.py'` | You are not in the project folder. Run `cd ~/Desktop/sales-call-prep-agent` |
-| `No such file or directory: 'requirements.txt'` | Same fix — run `cd ~/Desktop/sales-call-prep-agent` first |
-| `No module named 'dotenv'` | Run `source venv/bin/activate` then `pip install -r requirements.txt` |
+| `no such file or directory: sales-call-prep` | You skipped Step 3. Run `cd ~/Projects/sales-call-prep` |
+| `can't open file 'main.py'` | You are not in the project folder. Run `cd ~/Projects/sales-call-prep` |
+| `No module named 'dotenv'` or `No module named 'flask'` | Run `source venv/bin/activate` then `pip install -r requirements.txt` |
 | `AuthenticationError` | Your API key is missing or incorrect. Check your `.env` file |
+| `Address already in use` (website) | The website is already running in another Terminal window. Close it, or stop it with `Control + C` |
 
 ---
 
@@ -212,7 +225,7 @@ The agent runs four steps per briefing, each a separate call to Claude:
 | **3. Brief** | Generates the full seven-section briefing, informed by steps 1 and 2 |
 | **4. Review** | Reads its own output and flags weak spots: generic claims, bad questions, unlabeled assumptions |
 
-When you run the agent you see each step as it happens:
+When you run the terminal version you see each step as it happens:
 
 ```
 Preparing briefing for VP of Sales at Capital One...
@@ -239,23 +252,29 @@ Each step is a separate function in `agent.py`. Each prompt lives in `prompts.py
 | [Anthropic Python SDK](https://github.com/anthropics/anthropic-sdk-python) | Claude API client |
 | Claude Sonnet (`claude-sonnet-4-6`) | Language model |
 | python-dotenv | Loads the API key from `.env` |
+| Flask | Serves the website version |
 
-No frameworks. No databases. Four Python files and two dependencies.
+Both launchers share a single engine. No databases.
 
 ---
 
 ## File structure
 
 ```
-sales-call-prep-agent/
-├── main.py              # CLI entry point: input modes, validation, file output
-├── agent.py             # Calls the Claude API, returns markdown
+sales-call-prep/
+├── agent.py             # Shared engine: calls the Claude API, returns markdown
 ├── prompts.py           # One prompt per agent step plus a shared system prompt
+├── main.py              # Terminal launcher: input modes, validation, file output
+├── app.py               # Website launcher: Flask form and result page
+├── templates/
+│   └── index.html       # The web form
 ├── sample_input.json    # Example input for quick testing
 ├── requirements.txt     # Dependencies
 └── output/
     └── example_briefing.md   # Full example output
 ```
+
+Both `main.py` and `app.py` import the same `agent.py`. Improve a prompt or a step once, and both versions get it.
 
 ---
 
@@ -270,7 +289,7 @@ sales-call-prep-agent/
 
 ## Future improvements
 
-- Connect `gather_context()` to a live search API (Tavily, SerpAPI, or Anthropic's web search tool) for current, sourced context
+- Connect `gather_context()` to live web search (Anthropic's web search tool, or Tavily/SerpAPI) for current, sourced context
 - Add LinkedIn profile or recent news lookup for the specific prospect
 - Batch mode: accept a CSV of accounts, output a folder of briefings
 - CRM push: write briefings directly into HubSpot or Salesforce as contact notes
@@ -286,7 +305,6 @@ Three specific decisions worth noting:
 
 - **Prompts are separated by step, not bundled.** Changing the tone of the planning step does not affect the briefing format. Adding a new output section does not touch the system rules. Each layer can be changed independently.
 - **Uncertainty is a first-class output.** The agent is instructed to label inferences as assumptions and surface everything it does not know in a dedicated section. A briefing that presents guesses as facts is worse than no briefing.
-- **The extension point is named.** `gather_context()` in `agent.py` is where live search goes when this gets upgraded. It is a defined interface, not a comment in a README.
+- **One engine, two front ends.** The terminal and website versions share a single `agent.py`. The interface is separate from the logic, so a fix lands in both places at once.
 
 ---
-

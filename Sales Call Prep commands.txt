@@ -1,0 +1,20 @@
+=== FIRST TIME SETUP (do this once) ===
+
+cd ~/Projects/sales-call-prep
+
+python3 -m venv venv
+source venv/bin/activate
+
+pip install -r requirements.txt
+
+
+=== EVERY TIME YOU COME BACK ===
+
+cd ~/Projects/sales-call-prep
+source venv/bin/activate
+
+
+=== THEN PICK ONE ===
+
+python3 main.py     # terminal version
+python3 app.py      # website version (then open http://localhost:5001)

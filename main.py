@@ -10,12 +10,10 @@ Three ways to run it:
 import argparse
 import json
 import sys
-from datetime import datetime
-from pathlib import Path
 
 from dotenv import load_dotenv
 
-from agent import run_agent
+from agent import run_agent, save_output
 
 
 def validate_inputs(company, persona):
@@ -52,16 +50,6 @@ def load_inputs_from_file(path):
         sys.exit(1)
 
     return data["company"], data["persona"], data.get("notes", "")
-
-
-def save_output(content, company):
-    output_dir = Path("output")
-    output_dir.mkdir(exist_ok=True)
-    slug = company.lower().replace(" ", "_").replace("/", "_").replace(".", "")
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-    filepath = output_dir / f"{slug}_{timestamp}.md"
-    filepath.write_text(content, encoding="utf-8")
-    return filepath
 
 
 def main():

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sales Call Prep Agent</title>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --text: #1f2937;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --header-bg: #0f172a;
+      --success-bg: #f0fdf4;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--header-bg);
+      color: white;
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    header p {
+      color: #94a3b8;
+      margin-top: 0.4rem;
+      font-size: 0.9rem;
+    }
+
+    main {
+      max-width: 720px;
+      margin: 2.5rem auto;
+      padding: 0 1.25rem;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+    }
+
+    .card-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.35rem;
+    }
+
+    .label-hint {
+      font-weight: 400;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      margin-left: 0.3rem;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 0.65rem 0.875rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: var(--text);
+      background: #fafafa;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: white;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 85px;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 0.8rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.975rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 0.75rem;
+      transition: background 0.15s, opacity 0.15s;
+    }
+
+    button[type="submit"]:hover:not(:disabled) {
+      background: var(--primary-hover);
+    }
+
+    button[type="submit"]:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Spinner */
+    .spinner {
+      text-align: center;
+      padding: 2.5rem 0;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .spinner-ring {
+      width: 36px;
+      height: 36px;
+      border: 3px solid #e5e7eb;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+      margin: 0 auto 0.875rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Output */
+    .output-card {
+      margin-top: 1.5rem;
+    }
+
+    .output-card .card-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .output-card .card-title::before {
+      content: '';
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+    }
+
+    .output-content h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      color: var(--text);
+    }
+
+    .output-content h2 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #1e3a5f;
+      margin: 1.75rem 0 0.5rem;
+      padding-bottom: 0.35rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .output-content h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin: 1rem 0 0.35rem;
+    }
+
+    .output-content p {
+      line-height: 1.75;
+      margin-bottom: 0.75rem;
+      font-size: 0.95rem;
+    }
+
+    .output-content ul, .output-content ol {
+      padding-left: 1.4rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .output-content li {
+      margin-bottom: 0.4rem;
+      line-height: 1.65;
+      font-size: 0.95rem;
+    }
+
+    .output-content strong {
+      font-weight: 600;
+    }
+
+    .output-content hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1.5rem 0;
+    }
+
+    .output-content code {
+      background: #f1f5f9;
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      font-size: 0.875em;
+    }
+
+    .saved-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin: -1rem 0 1.25rem;
+    }
+
+    .saved-note code {
+      background: #f1f5f9;
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      font-size: 0.95em;
+      color: var(--text);
+    }
+
+    /* Error */
+    .error-box {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #dc2626;
+      padding: 0.875rem 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Sales Call Prep Agent</h1>
+    <p>Enter an account and role. Get a full pre-call briefing in under a minute.</p>
+  </header>
+
+  <main>
+    <div class="card">
+      <p class="card-title">Account details</p>
+      <form id="prep-form">
+        <div class="form-group">
+          <label for="company">Company name <span class="label-hint">required</span></label>
+          <input
+            type="text"
+            id="company"
+            name="company"
+            placeholder="e.g. Salesforce, Notion, Capital One"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="persona">Prospect role / title <span class="label-hint">required</span></label>
+          <input
+            type="text"
+            id="persona"
+            name="persona"
+            placeholder="e.g. VP of Sales, Head of Operations"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="notes">Context <span class="label-hint">optional but improves output</span></label>
+          <textarea
+            id="notes"
+            name="notes"
+            placeholder="What do you know about this account? What are you selling? Any intel from LinkedIn, a warm intro, or previous conversations?"
+          ></textarea>
+        </div>
+
+        <button type="submit" id="generate-btn">Generate Briefing</button>
+      </form>
+    </div>
+
+    <div id="spinner" class="spinner" hidden>
+      <div class="spinner-ring"></div>
+      Generating your briefing. This takes about 30 seconds.
+    </div>
+
+    <div id="error-box" class="error-box" hidden></div>
+
+    <div id="output-card" class="card output-card" hidden>
+      <p class="card-title">Briefing ready</p>
+      <p id="saved-note" class="saved-note" hidden></p>
+      <div id="output-content" class="output-content"></div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    const form = document.getElementById('prep-form');
+    const spinner = document.getElementById('spinner');
+    const outputCard = document.getElementById('output-card');
+    const outputContent = document.getElementById('output-content');
+    const savedNote = document.getElementById('saved-note');
+    const generateBtn = document.getElementById('generate-btn');
+    const errorBox = document.getElementById('error-box');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Reset state
+      outputCard.hidden = true;
+      savedNote.hidden = true;
+      errorBox.hidden = true;
+      spinner.hidden = false;
+      generateBtn.disabled = true;
+      generateBtn.textContent = 'Generating...';
+
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch('/generate', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Something went wrong. Please try again.');
+        }
+
+        outputContent.innerHTML = marked.parse(data.result);
+        if (data.saved_as) {
+          savedNote.innerHTML = 'Saved to <code>' + data.saved_as + '</code>';
+          savedNote.hidden = false;
+        }
+        outputCard.hidden = false;
+        outputCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      } catch (err) {
+        errorBox.textContent = err.message;
+        errorBox.hidden = false;
+      } finally {
+        spinner.hidden = true;
+        generateBtn.disabled = false;
+        generateBtn.textContent = 'Generate Briefing';
+      }
+    });
+  </script>
+
+</body>
+</html>
